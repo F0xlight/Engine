@@ -87,12 +87,10 @@ int main(){
 		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLogp);
 		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLogp << std::endl;
 	}
-	glUseProgram(shaderProgram);
 	glDeleteShader(vertexShader); //remove shaders from memory
 	glDeleteShader(fragmentShader);
-	
 
-	//create triangle
+	//setup vertex data to create triangle
 	float vertices[] = {
 		-0.5f, -0.5f, 0.0f,
 		 0.5f, -0.5f, 0.0f,
@@ -105,6 +103,7 @@ int main(){
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
+
 	//Vertex Buffer Objects  --> generate buffer ID (VBO)
 	unsigned int VBO;
 	glGenBuffers(1, &VBO);
@@ -113,6 +112,8 @@ int main(){
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); //set vertex attributes pointers
 	glEnableVertexAttribArray(0);
+
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);		//wireframe
 
 	//render loop
 	while (!glfwWindowShouldClose(window)) {
@@ -128,10 +129,12 @@ int main(){
 		glClear(GL_COLOR_BUFFER_BIT);
 		
 		
-		//smthing (drawing?)
+			//drawing
+		glUseProgram(shaderProgram);
+		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
-		//events and buffers
+		//io events and buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
@@ -141,6 +144,13 @@ int main(){
 		std::cout << 1000000/elapsed_time << std::endl;
 	}
 
+	//dealocate ressources
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteProgram(shaderProgram);
+
+	//clear ressources allocated to glfw
 	glfwTerminate();
+
 	return 0;
 }
